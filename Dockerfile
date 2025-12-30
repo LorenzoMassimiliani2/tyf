@@ -55,4 +55,4 @@ RUN chown -R www-data:www-data /var/www/html \
 
 EXPOSE 10000
 
-CMD ["sh", "-c", "rm -f bootstrap/cache/*.php && php artisan serve --host=0.0.0.0 --port=10000"]
+CMD ["sh", "-c", "rm -f bootstrap/cache/*.php && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000"]
