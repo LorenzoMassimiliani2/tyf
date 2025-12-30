@@ -18,11 +18,11 @@ class DatabaseSeeder extends Seeder
         User::query()->updateOrCreate(
             ['email' => 'admin@example.com'],
             [
-                'name' => 'Admin',
-                'password' => bcrypt('password'),
+                'name' => 'Lorenzo',
+                'password' => bcrypt('Org.123456'),
             ],
         );
 
-        $this->call(FakeDataSeeder::class);
+        //$this->call(FakeDataSeeder::class);
     }
 }
