@@ -1,5 +1,5 @@
 # ---- build stage ----
-FROM php:8.2-fpm-alpine AS build
+FROM php:8.4-fpm-alpine AS build
 
 RUN apk add --no-cache \
     git curl unzip icu-dev oniguruma-dev libzip-dev zip \
@@ -35,7 +35,7 @@ RUN php artisan config:clear \
 
 
 # ---- runtime stage ----
-FROM php:8.2-fpm-alpine AS runtime
+FROM php:8.4-fpm-alpine AS runtime
 
 RUN apk add --no-cache \
     nginx supervisor bash icu-dev oniguruma-dev libzip-dev zip postgresql-dev \
