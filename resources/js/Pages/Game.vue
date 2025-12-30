@@ -178,6 +178,8 @@ const myVote = computed(() => {
     if (!state.turn?.votes || !state.player?.id) return null;
     return state.turn.votes.find((v) => v.voter_id === state.player.id) || null;
 });
+const votesOk = computed(() => (state.turn?.votes || []).filter((v) => v.success));
+const votesKo = computed(() => (state.turn?.votes || []).filter((v) => !v.success));
 
 onMounted(() => {
     ensureToken();
@@ -302,7 +304,7 @@ onBeforeUnmount(() => {
                                 class="rounded-full bg-orange-400 text-slate-900 px-3 py-1 text-[11px] font-black tracking-wide shadow-sm border border-orange-400 cursor-pointer"
                                 :title="`Punteggio massimo: ${challenge.max_score} pt`"
                             >
-                                LIV. {{ challenge.level }}
+                                LIV. {{challenge.level}}
                             </span>
                         </div>
                         <p class="text-sm text-slate-600 mt-2 line-clamp-2">{{ challenge.description || 'Prova sorpresa' }}</p>
@@ -336,50 +338,72 @@ onBeforeUnmount(() => {
                         </div>
                     </div>
                     <div class="flex flex-col gap-3 items-stretch pt-2 border-orange-200">
-                        <div v-if="myVote" class="rounded-xl bg-white text-slate-900 px-3 py-2 text-sm font-semibold flex items-center gap-2">
-                            <span class="text-xs uppercase tracking-wide text-slate-500">Hai votato</span>
-                            <span
-                                class="rounded-full px-3 py-1 text-[11px] font-bold"
-                                :class="myVote.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
-                            >
-                                {{ myVote.success ? 'Superata' : 'Fallita' }}
-                            </span>
-                        </div>
+
                         <template v-if="state.turn.can_vote && !myVote">
-                            <button
-                                class="rounded-2xl bg-green-600 px-4 py-3 text-base font-bold text-white disabled:opacity-50"
-                                :disabled="loading"
-                                @click="sendVote(true)"
-                            >
-                                Superata
-                            </button>
-                            <button
-                                class="rounded-2xl bg-red-500 px-4 py-3 text-base font-bold text-white disabled:opacity-50"
-                                :disabled="loading"
-                                @click="sendVote(false)"
-                            >
-                                Fallita
-                            </button>
+                            <div class="flex items-center gap-3">
+                                <button
+                                    class="flex-1 rounded-2xl bg-green-600 px-4 py-4 text-lg font-bold text-white shadow hover:-translate-y-0.5 transition disabled:opacity-50"
+                                    :disabled="loading"
+                                    @click="sendVote(true)"
+                                >
+                                    Superata
+                                </button>
+                                <button
+                                    class="flex-1 rounded-2xl bg-red-500 px-4 py-4 text-lg font-bold text-white shadow hover:-translate-y-0.5 transition disabled:opacity-50"
+                                    :disabled="loading"
+                                    @click="sendVote(false)"
+                                >
+                                    Fallita
+                                </button>
+                            </div>
                         </template>
-                        <div class="flex flex-wrap gap-2">
-                            <span
-                                v-for="w in state.turn.waiting_for"
-                                :key="w.id"
-                                class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-slate-900"
-                            >
-                                In attesa: {{ w.name }}
-                            </span>
+                        <div class="grid gap-2 sm:grid-cols-3">
+                            <div class="rounded-xl bg-slate-100 border border-slate-200 px-3 py-2">
+                                <div class="text-[11px] font-bold uppercase tracking-wide text-slate-700 mb-1">
+                                    Attesa ({{ state.turn.waiting_for?.length || 0 }})
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <span
+                                        v-for="w in state.turn.waiting_for"
+                                        :key="w.id"
+                                        class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-slate-900"
+                                    >
+                                        {{ w.name }}
+                                    </span>
+                                    <span v-if="!state.turn.waiting_for?.length" class="text-[11px] text-slate-500">—</span>
+                                </div>
+                            </div>
+                            <div class="rounded-xl bg-green-50 border border-green-100 px-3 py-2">
+                                <div class="text-[11px] font-bold uppercase tracking-wide text-green-700 mb-1">
+                                    Superata ({{ votesOk.length }})
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <span
+                                        v-for="vote in votesOk"
+                                        :key="`ok-${vote.voter_id}`"
+                                        class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-green-800"
+                                    >
+                                        {{ vote.voter_name }}
+                                    </span>
+                                    <span v-if="!votesOk.length" class="text-[11px] text-green-700/70">—</span>
+                                </div>
+                            </div>
+                            <div class="rounded-xl bg-red-50 border border-red-100 px-3 py-2">
+                                <div class="text-[11px] font-bold uppercase tracking-wide text-red-700 mb-1">
+                                    Fallita ({{ votesKo.length }})
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <span
+                                        v-for="vote in votesKo"
+                                        :key="`ko-${vote.voter_id}`"
+                                        class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-red-800"
+                                    >
+                                        {{ vote.voter_name }}
+                                    </span>
+                                    <span v-if="!votesKo.length" class="text-[11px] text-red-700/70">—</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <span
-                            v-for="vote in state.turn.votes"
-                            :key="vote.voter_id"
-                            class="rounded-full px-3 py-1 text-[11px] font-semibold"
-                            :class="vote.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
-                        >
-                            {{ vote.voter_name }} • {{ vote.success ? 'OK' : 'KO' }}
-                        </span>
                     </div>
                 </div>
 
