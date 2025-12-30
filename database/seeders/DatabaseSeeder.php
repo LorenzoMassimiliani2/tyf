@@ -23,6 +23,6 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
-        $this->call(FakeDataSeeder::class);
+        //$this->call(FakeDataSeeder::class);
     }
 }
