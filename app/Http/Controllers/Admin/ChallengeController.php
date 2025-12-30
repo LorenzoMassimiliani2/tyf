@@ -10,11 +10,32 @@ use Inertia\Inertia;
 
 class ChallengeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $filters = [
+            'category_id' => $request->integer('category_id'),
+            'level' => $request->integer('level'),
+        ];
+
+        $challenges = Challenge::with('category')
+            ->when($filters['category_id'], fn ($query, $category) => $query->where('category_id', $category))
+            ->when($filters['level'], fn ($query, $level) => $query->where('level', $level))
+            ->orderBy('level')
+            ->orderBy('category_id')
+            ->orderByDesc('id')
+            ->get();
+
+        $stats = Challenge::selectRaw('category_id, level, COUNT(*) as total')
+            ->groupBy('category_id', 'level')
+            ->orderBy('level')
+            ->orderBy('category_id')
+            ->get();
+
         return Inertia::render('Admin/Challenges', [
-            'challenges' => Challenge::with('category')->orderByDesc('id')->get(),
+            'challenges' => $challenges,
             'categories' => Category::orderBy('name')->get(),
+            'filters' => $filters,
+            'stats' => $stats,
         ]);
     }
 
