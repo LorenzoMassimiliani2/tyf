@@ -3,10 +3,10 @@ FROM php:8.4-fpm-alpine AS build
 
 RUN apk add --no-cache \
     git curl unzip icu-dev oniguruma-dev libzip-dev zip \
-    nodejs npm postgresql-dev
+    nodejs npm postgresql-dev libsodium-dev
 
 RUN docker-php-ext-install \
-    pdo pdo_mysql pdo_pgsql intl mbstring zip opcache
+    pdo pdo_mysql pdo_pgsql intl mbstring zip opcache sodium
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -38,9 +38,9 @@ RUN php artisan config:clear \
 FROM php:8.4-fpm-alpine AS runtime
 
 RUN apk add --no-cache \
-    nginx supervisor bash icu-dev oniguruma-dev libzip-dev zip postgresql-dev \
+    nginx supervisor bash icu-dev oniguruma-dev libzip-dev zip postgresql-dev libsodium-dev \
  && docker-php-ext-install \
-    pdo pdo_mysql pdo_pgsql intl mbstring zip opcache
+    pdo pdo_mysql pdo_pgsql intl mbstring zip opcache sodium
 
 WORKDIR /var/www/html
 
