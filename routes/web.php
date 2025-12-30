@@ -6,6 +6,14 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', function () {
+    return response()->json([
+        'status' => 'ok',
+        'env' => app()->environment(),
+    ]);
+});
+
+
 Route::get('/', [LandingController::class, 'index'])->name('home');
 Route::get('/games/{code}', [LandingController::class, 'game'])->name('games.show');
 
