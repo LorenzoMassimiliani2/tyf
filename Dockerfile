@@ -55,4 +55,4 @@ RUN chown -R www-data:www-data /var/www/html \
 
 EXPOSE 10000
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
