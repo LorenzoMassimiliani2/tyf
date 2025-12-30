@@ -48,4 +48,36 @@ class CategoryController extends Controller
 
         return redirect()->back()->with('success', 'Categoria rimossa.');
     }
+
+    public function destroyByPayload(Request $request)
+    {
+        $data = $request->validate([
+            'id' => ['required', 'integer', 'exists:categories,id'],
+        ]);
+
+        $category = Category::find($data['id']);
+        $category->delete();
+
+        return response()->json(['message' => 'Categoria rimossa.']);
+    }
+
+    // Fallback per richieste PATCH senza ID nella path
+    public function updateByPayload(Request $request)
+    {
+        $data = $request->validate([
+            'id' => ['required', 'integer', 'exists:categories,id'],
+            'name' => ['required', 'string', 'max:60'],
+            'color' => ['nullable', 'string', 'max:20'],
+            'is_active' => ['boolean'],
+        ]);
+
+        $category = Category::find($data['id']);
+        $category->update([
+            'name' => $data['name'],
+            'color' => $data['color'] ?? null,
+            'is_active' => $data['is_active'] ?? false,
+        ]);
+
+        return response()->json(['message' => 'Categoria aggiornata.']);
+    }
 }

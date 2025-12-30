@@ -223,7 +223,7 @@ class GameController extends Controller
             'status' => 'voting',
             'selected_at' => now(),
             'difficulty' => $challenge?->level ?? $turn->difficulty,
-            'max_score' => ($challenge?->level ?? $turn->difficulty) * $playerCount,
+            'max_score' => ($challenge?->level ?? $turn->difficulty) * ($playerCount-1),
         ]);
 
         return $this->state($request, $code);
@@ -290,7 +290,9 @@ class GameController extends Controller
 
         $nextNumber = $turn->turn_number + 1;
 
-        if ($game->total_turns > 0 && $nextNumber > $game->total_turns) {
+        $turnLimit = $this->totalTurnLimit($game);
+
+        if ($turnLimit > 0 && $nextNumber > $turnLimit) {
             $game->update(['status' => 'finished', 'ended_at' => now()]);
             return;
         }
@@ -312,7 +314,8 @@ class GameController extends Controller
             return $latest;
         }
 
-        if ($game->total_turns > 0 && $game->current_turn_number > $game->total_turns) {
+        $turnLimit = $this->totalTurnLimit($game);
+        if ($turnLimit > 0 && $game->current_turn_number > $turnLimit) {
             $game->update(['status' => 'finished', 'ended_at' => now()]);
             return $latest;
         }
@@ -334,8 +337,19 @@ class GameController extends Controller
             'difficulty' => $difficulty,
             'status' => 'pending',
             'candidate_challenges' => $candidateIds,
-            'max_score' => $difficulty * $playerCount,
+            'max_score' => $difficulty * ($playerCount-1),
         ]);
+    }
+
+    protected function totalTurnLimit(Game $game): int
+    {
+        if ($game->total_turns === 0) {
+            return 0;
+        }
+
+        $active = $game->players()->where('status', 'active')->count();
+
+        return $game->total_turns * max(1, $active);
     }
 
     protected function playerForTurn(Game $game, int $turnNumber): GamePlayer
@@ -424,6 +438,10 @@ class GameController extends Controller
 
         if (!$actor) {
             return response()->json(['message' => 'Giocatore non trovato.'], 401);
+        }
+
+        if ($actor->id === $player->id) {
+            return response()->json(['message' => 'Non puoi approvare la tua richiesta.'], 403);
         }
 
         if ($player->game_id !== $game->id) {
@@ -571,9 +589,10 @@ class GameController extends Controller
                     'level' => $challenge->level,
                     'category' => $challenge->category?->name,
                     'category_color' => $challenge->category?->color,
-                    'max_score' => $challenge->level * $playerCount,
+                    'max_score' => $challenge->level * ($playerCount-1),
                 ];
             })
+            ->sortByDesc('level')
             ->values();
 
         $votes = $turn->votes()->with('voter')->get();
@@ -596,7 +615,7 @@ class GameController extends Controller
                     'level' => $challenge->level,
                     'category' => $challenge->category?->name,
                     'category_color' => $challenge->category?->color,
-                    'max_score' => $challenge->level * $playerCount,
+                    'max_score' => $challenge->level * ($playerCount-1),
                 ];
             }
         }

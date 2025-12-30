@@ -75,4 +75,23 @@ class ChallengeController extends Controller
 
         return redirect()->back()->with('success', 'Prova eliminata.');
     }
+
+    // Fallback per DELETE senza id in path
+    public function destroyByPayload(Request $request)
+    {
+        $id = $request->input('id');
+
+        if (!$id) {
+            return response()->noContent();
+        }
+
+        $data = $request->validate([
+            'id' => ['required', 'integer', 'exists:challenges,id'],
+        ]);
+
+        $challenge = Challenge::find($data['id']);
+        $challenge->delete();
+
+        return response()->json(['message' => 'Prova eliminata.']);
+    }
 }

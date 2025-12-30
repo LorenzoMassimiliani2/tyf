@@ -1,5 +1,5 @@
 <script setup>
-import { Head, useForm, usePage, router } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import { computed } from 'vue';
 
@@ -20,25 +20,63 @@ const submit = () => {
 };
 
 const updateCategory = async (category) => {
-    await axios.patch(route('admin.categories.update', category.id), category);
+    const url = category.id ? `/admin/categories/${category.id}` : '/admin/categories';
+    await axios.patch(url, {
+        id: category.id,
+        name: category.name,
+        color: category.color,
+        is_active: category.is_active,
+    });
     router.reload({ only: ['categories'] });
 };
 
 const deleteCategory = async (category) => {
     if (!confirm('Vuoi eliminare questa categoria?')) return;
-    await axios.delete(route('admin.categories.destroy', category.id));
-    router.reload({ only: ['categories'] });
+    router.delete(route('admin.categories.destroy', category.id), {
+        preserveScroll: true,
+        preserveState: true,
+        replace: true,
+        onFinish: () => router.reload({ only: ['categories'] }),
+    });
 };
 </script>
 
 <template>
     <Head title="Categorie" />
     <div class="min-h-screen bg-slate-100 py-10">
-        <div class="mx-auto max-w-4xl space-y-6 px-4">
-            <div>
-                <p class="text-sm font-semibold uppercase tracking-wide text-orange-600">Backoffice</p>
-                <h1 class="text-2xl font-black text-slate-900">Categorie</h1>
-                <p class="text-slate-600">Gestisci le categorie per le prove.</p>
+        <div class="mx-auto max-w-5xl space-y-6 px-4">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <p class="text-sm font-semibold uppercase tracking-wide text-orange-600">Backoffice</p>
+                    <h1 class="text-2xl font-black text-slate-900">Categorie</h1>
+                    <p class="text-slate-600">Gestisci le categorie per le prove.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Link
+                        :href="route('admin.categories.index')"
+                        class="rounded-full bg-[#1c2d4f] px-3 py-1 text-sm font-semibold text-white shadow hover:-translate-y-0.5 transition"
+                    >
+                        Categorie
+                    </Link>
+                    <Link
+                        :href="route('admin.challenges.index')"
+                        class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-700 shadow hover:-translate-y-0.5 transition"
+                    >
+                        Prove
+                    </Link>
+                    <Link
+                        :href="route('admin.sessions.index')"
+                        class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-700 shadow hover:-translate-y-0.5 transition"
+                    >
+                        Sessioni
+                    </Link>
+                    <Link
+                        :href="route('admin.db.index')"
+                        class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-700 shadow hover:-translate-y-0.5 transition"
+                    >
+                        DB
+                    </Link>
+                </div>
             </div>
 
             <div class="rounded-2xl bg-white p-5 shadow">
@@ -62,7 +100,7 @@ const deleteCategory = async (category) => {
                     </label>
                     <button
                         type="submit"
-                        class="sm:col-span-3 rounded-xl bg-slate-900 px-4 py-2 font-semibold text-white hover:-translate-y-0.5 transition"
+                        class="sm:col-span-3 rounded-xl bg-[#1c2d4f] px-4 py-2 font-semibold text-white hover:-translate-y-0.5 transition"
                     >
                         Salva
                     </button>
@@ -97,7 +135,7 @@ const deleteCategory = async (category) => {
                                 Attiva
                             </label>
                             <button
-                                class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white"
+                                class="rounded-full bg-[#1c2d4f] px-3 py-1 text-xs font-semibold text-white"
                                 @click="updateCategory({ ...cat })"
                             >
                                 Aggiorna

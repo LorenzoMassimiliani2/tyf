@@ -92,7 +92,11 @@ const updateChallenge = async (challenge) => {
 
 const deleteChallenge = async (challenge) => {
     if (!confirm('Eliminare questa prova?')) return;
-    await axios.delete(route('admin.challenges.destroy', challenge.id));
+    if (!challenge?.id) {
+        alert('ID prova mancante, impossibile eliminare.');
+        return;
+    }
+    await axios.delete(`/admin/challenges/${challenge.id}`);
     router.reload({ only: ['challenges', 'stats'] });
 };
 </script>
@@ -116,9 +120,21 @@ const deleteChallenge = async (challenge) => {
                     </Link>
                     <Link
                         :href="route('admin.challenges.index')"
-                        class="rounded-full bg-slate-900 px-3 py-1 text-sm font-semibold text-white shadow hover:-translate-y-0.5 transition"
+                        class="rounded-full bg-[#1c2d4f] px-3 py-1 text-sm font-semibold text-white shadow hover:-translate-y-0.5 transition"
                     >
                         Prove
+                    </Link>
+                    <Link
+                        :href="route('admin.sessions.index')"
+                        class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-700 shadow hover:-translate-y-0.5 transition"
+                    >
+                        Sessioni
+                    </Link>
+                    <Link
+                        :href="route('admin.db.index')"
+                        class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-700 shadow hover:-translate-y-0.5 transition"
+                    >
+                        DB
                     </Link>
                 </div>
             </div>
@@ -202,7 +218,7 @@ const deleteChallenge = async (challenge) => {
                     </label>
                     <button
                         type="button"
-                        class="sm:col-span-2 rounded-xl bg-slate-900 px-4 py-2 font-semibold text-white hover:-translate-y-0.5 transition"
+                        class="sm:col-span-2 rounded-xl bg-[#1c2d4f] px-4 py-2 font-semibold text-white hover:-translate-y-0.5 transition"
                         @click="submit"
                     >
                         Salva prova
@@ -230,7 +246,7 @@ const deleteChallenge = async (challenge) => {
                     <div class="flex gap-2">
                         <button
                             type="button"
-                            class="rounded-xl bg-slate-900 px-4 py-2 font-semibold text-white hover:-translate-y-0.5 transition"
+                            class="rounded-xl bg-[#1c2d4f] px-4 py-2 font-semibold text-white hover:-translate-y-0.5 transition"
                             @click="applyFilters"
                         >
                             Applica filtri
@@ -287,7 +303,7 @@ const deleteChallenge = async (challenge) => {
                                                 </label>
                                             </div>
                                             <div class="flex items-center gap-2">
-                                                <button class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white" @click="updateChallenge({ ...item })">
+                                                <button class="rounded-full bg-[#1c2d4f] px-3 py-1 text-xs font-semibold text-white" @click="updateChallenge({ ...item })">
                                                     Aggiorna
                                                 </button>
                                                 <button class="text-xs font-semibold text-red-600" @click="deleteChallenge(item)">Elimina</button>
