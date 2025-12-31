@@ -13,8 +13,9 @@ Route::get('/host', [LandingController::class, 'host'])->name('host');
 Route::get('/join', [LandingController::class, 'join'])->name('join');
 Route::get('/games/{code}', [LandingController::class, 'game'])->name('games.show');
 
+Route::middleware(['auth', 'verified'])->get('/dashboard', fn () => redirect()->route('admin.dashboard'))->name('dashboard');
+
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-      Route::get('/categories', [CategoryController::class, 'index'])->name('dashboard');
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::patch('/categories', [CategoryController::class, 'updateByPayload'])->name('categories.update.fallback');

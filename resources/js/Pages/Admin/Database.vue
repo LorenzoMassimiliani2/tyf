@@ -19,6 +19,10 @@ const submit = async () => {
         { preserveScroll: true, preserveState: true, replace: true }
     );
 };
+
+const logout = () => {
+    router.post(route('logout'));
+};
 </script>
 
 <template>
@@ -56,6 +60,13 @@ const submit = async () => {
                     >
                         DB
                     </Link>
+                    <button
+                        type="button"
+                        class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-700 shadow hover:-translate-y-0.5 transition"
+                        @click="logout"
+                    >
+                        Logout
+                    </button>
                 </div>
             </div>
 

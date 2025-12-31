@@ -56,24 +56,24 @@ const submit = async () => {
 
 <template>
     <Head title="Unisciti a una partita" />
-    <div class="min-h-screen bg-gradient-to-b from-white via-orange-50 to-amber-100">
+    <div class="min-h-screen bg-gradient-to-b from-orange-50 via-amber-50 to-orange-100">
         <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute top-16 right-6 h-28 w-28 bg-orange-400/25 rounded-full blur-3xl" />
-            <div class="absolute bottom-8 left-6 h-32 w-32 bg-[#1c2d4f]/10 rounded-full blur-3xl" />
+            <div class="absolute top-16 right-6 h-28 w-28 bg-orange-400/30 rounded-full blur-3xl" />
+            <div class="absolute bottom-8 left-6 h-32 w-32 bg-orange-200/30 rounded-full blur-3xl" />
         </div>
 
         <div class="relative mx-auto max-w-xl px-4 py-12 space-y-8">
             <div class="flex items-center justify-between">
-                <Link :href="route('home')" class="text-sm font-semibold text-slate-800">← Home</Link>
-                <span class="rounded-full bg-[#1c2d4f]/80 px-3 py-1 text-xs font-semibold text-white">Join</span>
+                <Link :href="route('home')" class="text-sm font-semibold text-orange-700">← Home</Link>
+                <span class="rounded-full bg-orange-500/90 px-3 py-1 text-xs font-semibold text-white">Join</span>
             </div>
 
             <header class="space-y-2">
                 <h1 class="text-3xl font-black text-slate-900">Entra in una partita</h1>
-                <p class="text-sm text-slate-700">Inserisci il codice e il tuo nome. Pensata per stare su una mano mentre tieni il telefono.</p>
+                <p class="text-sm text-slate-700">Inserisci il codice e il tuo nome.</p>
             </header>
 
-            <div class="space-y-5 rounded-3xl bg-white px-5 py-5 shadow-lg shadow-orange-200/70 ring-1 ring-slate-900/5">
+            <div class="space-y-5 rounded-3xl bg-white px-5 py-5 shadow-lg shadow-orange-200/70 ring-1 ring-orange-100">
                 <div class="space-y-2">
                     <label class="text-sm font-semibold text-slate-800">Codice partita</label>
                     <input
@@ -90,7 +90,6 @@ const submit = async () => {
                         v-model="form.name"
                         type="text"
                         class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-orange-400 focus:ring-orange-200"
-                        placeholder="Tipo: Panda Ninja"
                     />
                 </div>
 
@@ -113,7 +112,7 @@ const submit = async () => {
                 <button
                     type="button"
                     @click="submit"
-                    class="w-full rounded-2xl bg-[#1c2d4f] px-4 py-3 text-lg font-bold text-white shadow-lg shadow-slate-900/40 transition hover:-translate-y-0.5 disabled:opacity-50"
+                    class="w-full rounded-2xl bg-gradient-to-r from-orange-500 to-orange-400 px-4 py-3 text-lg font-bold text-white shadow-lg shadow-orange-200/70 transition hover:-translate-y-0.5 disabled:opacity-50"
                     :disabled="loading"
                 >
                     {{ loading ? 'Entro...' : 'Entra nella partita' }}

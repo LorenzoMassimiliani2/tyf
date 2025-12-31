@@ -19,24 +19,43 @@ import { Head, Link } from '@inertiajs/vue3';
             <div class="space-y-4">
                 <Link
                     :href="route('host')"
-                    class="block rounded-2xl bg-[#1c2d4f] px-5 py-4 text-white text-lg font-bold shadow-lg shadow-slate-900/40 transition hover:-translate-y-0.5"
+                    class="block rounded-3xl bg-gradient-to-r from-[#1c2d4f] via-[#1f2f54] to-[#1c2d4f] px-6 py-6 text-white text-lg font-black shadow-xl shadow-slate-900/50 transition hover:-translate-y-0.5"
                 >
-                    Crea partita
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🎲</span>
+                            <div class="text-left">
+                                <p class="text-base font-semibold leading-tight text-white/70">Host</p>
+                                <p class="text-2xl font-black leading-tight">Crea partita</p>
+                            </div>
+                        </div>
+                        <span class="text-2xl">→</span>
+                    </div>
                 </Link>
                 <Link
                     :href="route('join')"
-                    class="block rounded-2xl bg-white px-5 py-4 text-slate-900 text-lg font-bold shadow-lg shadow-orange-200/70 ring-1 ring-slate-900/5 transition hover:-translate-y-0.5"
+                    class="block rounded-3xl bg-gradient-to-r from-orange-500 to-orange-400 px-6 py-6 text-white text-lg font-black shadow-xl shadow-orange-400/60 transition hover:-translate-y-0.5"
                 >
-                    Unisciti con codice
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🚀</span>
+                            <div class="text-left">
+                                <p class="text-base font-semibold leading-tight text-white/80">Join</p>
+                                <p class="text-2xl font-black leading-tight">Unisciti a una partita</p>
+                            </div>
+                        </div>
+                        <span class="text-xl text-white">→</span>
+                    </div>
                 </Link>
             </div>
 
             <div class="flex justify-center">
                 <Link
                     :href="route('admin.challenges.index')"
-                    class="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 text-xs font-semibold text-slate-800 shadow ring-1 ring-white/80"
+                    class="inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-2 text-[11px] font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200 hover:-translate-y-0.5 transition"
                 >
-                    Area admin <span aria-hidden="true">↗</span>
+                    <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-orange-700 text-sm">⚙️</span>
+                    <span>Area admin</span>
                 </Link>
             </div>
         </div>

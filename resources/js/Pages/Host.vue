@@ -87,13 +87,13 @@ const toggleCategory = (id) => {
 
             <header class="space-y-2">
                 <h1 class="text-3xl font-black">Crea una partita</h1>
-                <p class="text-sm text-white/70">Imposta nome, avatar e difficoltà. Tutto in verticale, pronto per il telefono.</p>
+                <p class="text-sm text-white/70">Imposta nome, avatar e difficoltà.</p>
             </header>
 
             <div class="space-y-5 rounded-3xl bg-white/5 p-5 shadow-lg shadow-black/30 ring-1 ring-white/10 backdrop-blur">
                 <div class="space-y-2">
                     <label class="text-sm font-semibold">Nome host</label>
-                    <input v-model="form.host_name" type="text" class="w-full rounded-2xl bg-white/10 px-4 py-3 text-white placeholder:text-white/60 focus:border-orange-300 focus:ring-orange-200" placeholder="Tipo: Capitan Volpe" />
+                    <input v-model="form.host_name" type="text" class="w-full rounded-2xl bg-white/10 px-4 py-3 text-white placeholder:text-white/60 focus:border-orange-300 focus:ring-orange-200" />
                 </div>
 
                 <div class="space-y-3">
@@ -147,7 +147,6 @@ const toggleCategory = (id) => {
                 <div class="space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-semibold">Categorie</span>
-                        <span class="text-xs text-white/60">Lasciale tutte se vuoi</span>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <button

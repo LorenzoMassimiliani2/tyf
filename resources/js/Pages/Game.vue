@@ -178,6 +178,7 @@ const myVote = computed(() => {
     if (!state.turn?.votes || !state.player?.id) return null;
     return state.turn.votes.find((v) => v.voter_id === state.player.id) || null;
 });
+const isPlayingTurn = computed(() => state.turn?.player?.id === state.player?.id);
 const votesOk = computed(() => (state.turn?.votes || []).filter((v) => v.success));
 const votesKo = computed(() => (state.turn?.votes || []).filter((v) => !v.success));
 
@@ -283,7 +284,8 @@ onBeforeUnmount(() => {
                         </p>
                         <p class="text-lg font-bold flex items-center gap-2">
                             <span class="text-xl">{{ state.turn?.player?.avatar_url || '🙂' }}</span>
-                            <span>{{ state.turn?.player?.name || '...' }}</span>
+                            <span v-if="isPlayingTurn" >È il tuo turno</span>
+                            <span v-else>{{ state.turn?.player?.name || '...' }}</span>
                         </p>
                     </div>
                   
@@ -301,7 +303,7 @@ onBeforeUnmount(() => {
                                 <p class="text-base font-normal text-slate-900 normal-case">{{ challenge.title }}</p>
                             </div>
                             <span
-                                class="rounded-full bg-orange-400 text-slate-900 px-3 py-1 text-[11px] font-black tracking-wide shadow-sm border border-orange-400 cursor-pointer"
+                                class="rounded-full bg-orange-400 text-slate-900 px-3 py-1 text-[11px] font-black tracking-wide shadow-sm border border-orange-400 cursor-pointer whitespace-nowrap"
                                 :title="`Punteggio massimo: ${challenge.max_score} pt`"
                             >
                                 LIV. {{challenge.level}}
@@ -321,20 +323,11 @@ onBeforeUnmount(() => {
                     </article>
                 </div>
 
-                <div v-if="state.turn?.selected_challenge" class="rounded-2xl border border-orange-200 bg-orange-50/90 px-4 py-4 space-y-3 shadow-md shadow-orange-200/60">
-                    <div class="flex items-start justify-between gap-3">
+                <div v-if="state.turn?.selected_challenge" class="rounded-2xl px-1 py-1 space-y-3">
+                    <div class="flex items-start gap-3">
                         <div>
                             <p class="text-xl font-black text-slate-900 leading-tight">{{ state.turn.selected_challenge.title }}</p>
                             <p class="text-base text-slate-800 mt-1">{{ state.turn.selected_challenge.description }}</p>
-                        </div>
-                        <div class="flex flex-col items-end gap-2 text-[11px] font-semibold">
-                            <span
-                                class="rounded-full bg-orange-400 text-slate-900 px-3 py-1 border border-orange-400 shadow cursor-pointer"
-                                :title="`Punteggio massimo: ${state.turn.selected_challenge.max_score} pt`"
-                            >
-                                LIV. {{ state.turn.selected_challenge.level }}
-                            </span>
-                            <span class="rounded-full bg-slate-900 text-white px-3 py-1">Max {{ state.turn.selected_challenge.max_score }} pt</span>
                         </div>
                     </div>
                     <div class="flex flex-col gap-3 items-stretch pt-2 border-orange-200">
@@ -342,61 +335,66 @@ onBeforeUnmount(() => {
                         <template v-if="state.turn.can_vote && !myVote">
                             <div class="flex items-center gap-3">
                                 <button
-                                    class="flex-1 rounded-2xl bg-green-600 px-4 py-4 text-lg font-bold text-white shadow hover:-translate-y-0.5 transition disabled:opacity-50"
+                                    class="flex-1 rounded-2xl bg-green-600 px-4 py-4 text-lg font-black leading-tight text-white shadow-md hover:-translate-y-0.5 transition disabled:opacity-50 min-h-[60px] flex flex-col items-center justify-center gap-1"
                                     :disabled="loading"
                                     @click="sendVote(true)"
                                 >
-                                    Superata
+                                    <span>Superata</span>
+                                    <span class="text-[12px] font-semibold opacity-90">+{{ state.turn.selected_challenge.level }} pt</span>
                                 </button>
                                 <button
-                                    class="flex-1 rounded-2xl bg-red-500 px-4 py-4 text-lg font-bold text-white shadow hover:-translate-y-0.5 transition disabled:opacity-50"
+                                    class="flex-1 rounded-2xl bg-red-500 px-4 py-4 text-lg font-black leading-tight text-white shadow-md hover:-translate-y-0.5 transition disabled:opacity-50 min-h-[60px] flex flex-col items-center justify-center gap-1"
                                     :disabled="loading"
                                     @click="sendVote(false)"
                                 >
-                                    Fallita
+                                    <span>Fallita</span>
+                                    <span class="text-[12px] font-semibold opacity-90">+0 pt</span>
                                 </button>
                             </div>
                         </template>
-                        <div class="grid gap-2 sm:grid-cols-3">
-                            <div class="rounded-xl bg-slate-100 border border-slate-200 px-3 py-2">
-                                <div class="text-[11px] font-bold uppercase tracking-wide text-slate-700 mb-1">
-                                    Attesa ({{ state.turn.waiting_for?.length || 0 }})
+                        <div class="grid gap-2 sm:grid-cols-3 text-sm">
+                            <div class="rounded-lg bg-slate-100/90 border border-slate-200 px-3 py-2 shadow-sm">
+                                <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wide text-slate-700">
+                                    <span>Attesa</span>
+                                    <span class="rounded-full bg-slate-900 text-white px-2 py-[2px] text-[10px]">{{ state.turn.waiting_for?.length || 0 }}</span>
                                 </div>
-                                <div class="flex flex-wrap gap-2">
+                                <div class="flex gap-2 overflow-x-auto pt-1">
                                     <span
                                         v-for="w in state.turn.waiting_for"
                                         :key="w.id"
-                                        class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-slate-900"
+                                        class="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-900 whitespace-nowrap"
                                     >
                                         {{ w.name }}
                                     </span>
                                     <span v-if="!state.turn.waiting_for?.length" class="text-[11px] text-slate-500">—</span>
                                 </div>
                             </div>
-                            <div class="rounded-xl bg-green-50 border border-green-100 px-3 py-2">
-                                <div class="text-[11px] font-bold uppercase tracking-wide text-green-700 mb-1">
-                                    Superata ({{ votesOk.length }})
+                            <div class="rounded-lg bg-green-50 border border-green-100 px-3 py-2 shadow-sm">
+                                <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wide text-green-700">
+                                    <span>Superata</span>
+                                    <span class="rounded-full bg-green-600 text-white px-2 py-[2px] text-[10px]">{{ votesOk.length }}</span>
                                 </div>
-                                <div class="flex flex-wrap gap-2">
+                                <div class="flex gap-2 overflow-x-auto pt-1">
                                     <span
                                         v-for="vote in votesOk"
                                         :key="`ok-${vote.voter_id}`"
-                                        class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-green-800"
+                                        class="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-green-800 whitespace-nowrap border border-green-100"
                                     >
                                         {{ vote.voter_name }}
                                     </span>
                                     <span v-if="!votesOk.length" class="text-[11px] text-green-700/70">—</span>
                                 </div>
                             </div>
-                            <div class="rounded-xl bg-red-50 border border-red-100 px-3 py-2">
-                                <div class="text-[11px] font-bold uppercase tracking-wide text-red-700 mb-1">
-                                    Fallita ({{ votesKo.length }})
+                            <div class="rounded-lg bg-red-50 border border-red-100 px-3 py-2 shadow-sm">
+                                <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wide text-red-700">
+                                    <span>Fallita</span>
+                                    <span class="rounded-full bg-red-600 text-white px-2 py-[2px] text-[10px]">{{ votesKo.length }}</span>
                                 </div>
-                                <div class="flex flex-wrap gap-2">
+                                <div class="flex gap-2 overflow-x-auto pt-1">
                                     <span
                                         v-for="vote in votesKo"
                                         :key="`ko-${vote.voter_id}`"
-                                        class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-red-800"
+                                        class="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-red-800 whitespace-nowrap border border-red-100"
                                     >
                                         {{ vote.voter_name }}
                                     </span>
@@ -412,35 +410,44 @@ onBeforeUnmount(() => {
                 </div>
             </section>
 
-            <section v-if="state.game?.status !== 'lobby' && activeTab === 'board'" class="rounded-2xl bg-white text-slate-900 px-4 py-4 space-y-2">
-                <h3 class="text-base font-bold">Classifica</h3>
-                <div class="space-y-2">
+            <section v-if="state.game?.status !== 'lobby' && activeTab === 'board'" class="rounded-2xl bg-white text-slate-900 px-4 py-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-base font-bold tracking-tight">Classifica</h3>
+                </div>
+                <div class="space-y-3">
                     <div
                         v-for="(row, i) in state.leaderboard"
                         :key="row.id"
-                        class="rounded-xl border border-slate-100 px-3 py-2 flex items-center justify-between"
+                        class="rounded-2xl px-3 py-3 flex items-center justify-between border shadow-sm"
+                        :class="i === 0 ? 'bg-orange-100/80 border-orange-200' : 'bg-slate-100 border-slate-200'"
                     >
-                        <div class="flex items-center gap-2">
-                            <span class="text-[11px] font-bold text-orange-600 w-6 text-center">#{{ i + 1 }}</span>
-                            <span class="text-lg">{{ row.avatar_url || '🙂' }}</span>
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="flex h-9 w-9 items-center justify-center rounded-full text-sm font-black"
+                                :class="i === 0 ? 'bg-orange-500 text-white' : 'bg-white text-slate-700 border border-slate-200'"
+                            >
+                                #{{ i + 1 }}
+                            </span>
+                            <span class="text-xl">{{ row.avatar_url || '🙂' }}</span>
                             <div>
-                                <p class="font-semibold text-slate-900">{{ row.name }}</p>
+                                <p class="font-semibold text-slate-900 leading-tight">{{ row.name }}</p>
                                 <p class="text-[11px] text-slate-500">{{ row.turns }} turni</p>
                             </div>
                         </div>
-                        <p class="text-sm font-black text-slate-900">{{ row.score }} pt</p>
+                        <div class="text-right">
+                            <p class="text-lg font-black text-slate-900">{{ row.score }} pt</p>
+                        </div>
                     </div>
                     <p v-if="!state.leaderboard?.length" class="text-sm text-slate-500">Ancora nessun turno completato.</p>
                 </div>
             </section>
 
-            <section v-if="state.game?.status !== 'lobby' && activeTab === 'info'" class="rounded-2xl bg-white/5 px-4 py-4 space-y-3 ring-1 ring-white/10">
+            <section v-if="state.game?.status !== 'lobby' && activeTab === 'info'" class="rounded-2xl bg-white text-slate-900 px-4 py-4 space-y-3 shadow-md shadow-orange-100/60 border border-slate-100">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-semibold">Codice: {{ code }}</p>
-                        <p class="text-[11px] text-white/60">Stato: {{ state.game?.status || 'lobby' }}</p>
+                        <p class="text-xl font-semibold">Codice: {{ code }}</p>
                     </div>
-                    <p class="text-[11px] text-white/60">Turni tot: {{ state.game?.total_turns === 0 ? '∞' : state.game?.total_turns }}</p>
+                    <p class="text-[11px] text-slate-500">Turni tot: {{ state.game?.total_turns === 0 ? '∞' : state.game?.total_turns }}</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <div>
@@ -451,17 +458,17 @@ onBeforeUnmount(() => {
                     <div
                         v-for="p in state.players"
                         :key="p.id"
-                        class="rounded-xl bg-white/10 px-3 py-2 flex items-center justify-between"
+                        class="rounded-xl bg-slate-50 px-3 py-2 flex items-center justify-between border border-slate-100"
                     >
                         <div class="flex items-center gap-2">
                             <span class="text-xl">{{ p.avatar_url || '🙂' }}</span>
                             <div>
                                 <p class="font-semibold">{{ p.name }}</p>
-                                <p class="text-[11px] text-white/60">Score: {{ p.score }} | Turni: {{ p.turns_played ?? 0 }}</p>
+                                <p class="text-[11px] text-slate-500">Score: {{ p.score }} | Turni: {{ p.turns_played ?? 0 }}</p>
                             </div>
                         </div>
                         <button
-                            class="text-[11px] font-semibold text-red-300"
+                            class="text-[11px] font-semibold text-red-600"
                             @click="removePlayer(p.id)"
                         >
                             Rimuovi
@@ -472,19 +479,19 @@ onBeforeUnmount(() => {
                 <div class="space-y-2">
                     <div class="flex items-center justify-between">
                         <p class="text-sm font-semibold">Richieste di ingresso</p>
-                        <p class="text-[11px] text-white/60">{{ state.join_requests.length }}</p>
+                        <p class="text-[11px] text-slate-500">{{ state.join_requests.length }}</p>
                     </div>
-                    <div v-if="!state.join_requests.length" class="text-[12px] text-white/60">Nessuna richiesta.</div>
+                    <div v-if="!state.join_requests.length" class="text-[12px] text-slate-500">Nessuna richiesta.</div>
                     <div
                         v-for="p in state.join_requests"
                         :key="p.id"
-                        class="rounded-xl bg-white/10 px-3 py-2 flex items-center justify-between"
+                        class="rounded-xl bg-slate-50 px-3 py-2 flex items-center justify-between border border-slate-100"
                     >
                         <div class="flex items-center gap-2">
                             <span class="text-xl">{{ p.avatar_url || '🙂' }}</span>
                             <div>
                                 <p class="font-semibold">Nuovo collegamento per {{ p.name }}</p>
-                                <p class="text-[11px] text-white/60">In attesa</p>
+                                <p class="text-[11px] text-slate-500">In attesa</p>
                             </div>
                         </div>
                         <div class="flex gap-2" v-if="p.id !== state.player?.id">

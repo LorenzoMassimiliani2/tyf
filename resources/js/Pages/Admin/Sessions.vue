@@ -16,6 +16,10 @@ const deleteGame = async (game) => {
     await axios.delete(`/admin/sessions/${game.id}`);
     router.reload({ only: ['games'] });
 };
+
+const logout = () => {
+    router.post(route('logout'));
+};
 </script>
 
 <template>
@@ -53,6 +57,13 @@ const deleteGame = async (game) => {
                     >
                         DB
                     </Link>
+                    <button
+                        type="button"
+                        class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-slate-700 shadow hover:-translate-y-0.5 transition"
+                        @click="logout"
+                    >
+                        Logout
+                    </button>
                 </div>
             </div>
 
