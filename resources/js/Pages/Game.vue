@@ -179,6 +179,27 @@ const myVote = computed(() => {
     return state.turn.votes.find((v) => v.voter_id === state.player.id) || null;
 });
 const isPlayingTurn = computed(() => state.turn?.player?.id === state.player?.id);
+
+const updateDrinks = async (playerId, delta) => {
+    if (!playerId || loading.value) return;
+    loading.value = true;
+    error.value = '';
+    try {
+        await axios.post(
+            `/api/games/${code.value}/players/${playerId}/drinks`,
+            { delta },
+            { headers: headers.value },
+        );
+        await fetchState();
+    } catch (e) {
+        error.value = e.response?.data?.message || 'Errore aggiornamento bevute.';
+    } finally {
+        loading.value = false;
+    }
+};
+
+const incrementDrink = (id) => updateDrinks(id, 1);
+const decrementDrink = (id) => updateDrinks(id, -1);
 const votesOk = computed(() => (state.turn?.votes || []).filter((v) => v.success));
 const votesKo = computed(() => (state.turn?.votes || []).filter((v) => !v.success));
 
@@ -436,6 +457,32 @@ onBeforeUnmount(() => {
                         </div>
                         <div class="text-right">
                             <p class="text-lg font-black text-slate-900">{{ row.score }} pt</p>
+                            <div class="mt-1 flex items-center justify-end gap-2">
+                                <button
+                                    class="h-6 w-6 rounded-full border border-slate-200 bg-white text-xs font-bold text-slate-700"
+                                    @click="decrementDrink(row.id)"
+                                >
+                                    -
+                                </button>
+                                <div class="flex items-center gap-1">
+                                    <span
+                                        v-for="n in Math.min(row.drinks_count || 0, 5)"
+                                        :key="`drink-${row.id}-${n}`"
+                                        class="text-sm"
+                                    >
+                                        🍹
+                                    </span>
+                                    <span v-if="(row.drinks_count || 0) > 5" class="text-[11px] text-slate-500">
+                                        +{{ (row.drinks_count || 0) - 5 }}
+                                    </span>
+                                </div>
+                                <button
+                                    class="h-6 w-6 rounded-full border border-slate-200 bg-white text-xs font-bold text-slate-700"
+                                    @click="incrementDrink(row.id)"
+                                >
+                                    +
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <p v-if="!state.leaderboard?.length" class="text-sm text-slate-500">Ancora nessun turno completato.</p>

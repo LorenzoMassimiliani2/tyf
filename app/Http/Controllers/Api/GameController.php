@@ -518,6 +518,30 @@ class GameController extends Controller
         return response()->json(['message' => 'Uscito dalla partita.']);
     }
 
+    public function updateDrinks(Request $request, string $code, GamePlayer $player)
+    {
+        $game = Game::where('code', strtoupper($code))->firstOrFail();
+        $actor = $this->playerFromRequest($request, $game);
+
+        if (!$actor) {
+            return response()->json(['message' => 'Giocatore non trovato.'], 401);
+        }
+
+        if ($player->game_id !== $game->id) {
+            abort(404);
+        }
+
+        $delta = (int) $request->input('delta', 0);
+        if (!in_array($delta, [-1, 1], true)) {
+            return response()->json(['message' => 'Delta non valido.'], 422);
+        }
+
+        $player->drinks_count = max(0, (int) $player->drinks_count + $delta);
+        $player->save();
+
+        return response()->json(['drinks_count' => $player->drinks_count]);
+    }
+
     protected function playerFromRequest(Request $request, Game $game): ?GamePlayer
     {
         $token = $request->header('X-PLAYER-TOKEN') ?? $request->input('player_token');
@@ -650,6 +674,7 @@ class GameController extends Controller
                 'score' => $player->score,
                 'turns' => $game->turns()->where('player_id', $player->id)->count(),
                 'avatar_url' => $player->avatar_url,
+                'drinks_count' => $player->drinks_count ?? 0,
             ])
             ->sortByDesc('score')
             ->values()

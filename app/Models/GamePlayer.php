@@ -14,6 +14,7 @@ class GamePlayer extends Model
         'is_host',
         'status',
         'score',
+        'drinks_count',
         'turn_order',
         'last_seen_at',
     ];

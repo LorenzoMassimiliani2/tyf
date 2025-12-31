@@ -10,6 +10,7 @@ Route::middleware('api')->prefix('games')->group(function () {
     Route::get('/{code}/state', [GameController::class, 'state']);
     Route::post('/{code}/choose', [GameController::class, 'chooseChallenge']);
     Route::post('/{code}/vote', [GameController::class, 'vote']);
+    Route::post('/{code}/players/{player}/drinks', [GameController::class, 'updateDrinks']);
     Route::post('/{code}/join/{player}/approve', [GameController::class, 'approveJoin']);
     Route::post('/{code}/join/{player}/reject', [GameController::class, 'rejectJoin']);
     Route::post('/{code}/players/{player}/remove', [GameController::class, 'removePlayer']);
