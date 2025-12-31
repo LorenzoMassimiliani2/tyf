@@ -13,8 +13,14 @@ const statusLabel = (status) => {
 
 const deleteGame = async (game) => {
     if (!confirm(`Eliminare la sessione ${game.code}?`)) return;
-    await axios.delete(`/admin/sessions/${game.id}`);
-    router.reload({ only: ['games'] });
+    if (!game?.id) {
+        alert('ID sessione mancante, impossibile eliminare.');
+        return;
+    }
+    router.delete(route('admin.sessions.destroy', game.id), {
+        preserveScroll: true,
+        onFinish: () => router.reload({ only: ['games'] }),
+    });
 };
 
 const logout = () => {

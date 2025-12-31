@@ -86,7 +86,21 @@ const submit = async () => {
 };
 
 const updateChallenge = async (challenge) => {
-    await axios.patch(route('admin.challenges.update', challenge.id), challenge);
+    if (!challenge?.id) {
+        alert('ID prova mancante, impossibile aggiornare.');
+        return;
+    }
+
+    const payload = {
+        category_id: challenge.category_id,
+        title: challenge.title,
+        description: challenge.description,
+        level: challenge.level,
+        is_active: challenge.is_active,
+        _method: 'patch',
+    };
+
+    await axios.post(`/admin/challenges/${challenge.id}`, payload);
     router.reload({ only: ['challenges', 'stats'] });
 };
 
